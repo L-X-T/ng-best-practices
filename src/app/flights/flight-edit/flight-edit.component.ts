@@ -1,10 +1,10 @@
-import { Component, inject, Input, OnChanges } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { Component, DestroyRef, effect, inject, input, model } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { Observable } from 'rxjs';
-import { debounceTime, delay, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
+import { debounceTime, delay, distinctUntilChanged } from 'rxjs/operators';
 
 import { pattern } from '../../shared/global';
 
@@ -16,36 +16,78 @@ import { Flight } from '../../entities/flight';
   imports: [ReactiveFormsModule],
   templateUrl: './flight-edit.component.html',
 })
-export class FlightEditComponent implements OnChanges {
-  protected flight$?: Observable<Flight>;
-  @Input() flight?: Flight;
+export class FlightEditComponent {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly fb = inject(FormBuilder);
+  private readonly flightService = inject(FlightService);
+  private readonly router = inject(Router);
 
-  protected id?: number;
-  protected showDetails = false;
+  protected flight$?: Observable<Flight>;
+  readonly flight = model<Flight>();
+
+  readonly id = input<number>();
+  readonly showDetails = input(false);
+
   protected message = '';
   protected pattern = pattern;
-  protected editForm!: FormGroup;
+  protected editForm = this.fb.group({
+    id: [0, Validators.required],
+    from: [
+      '',
+      {
+        validators: [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(15),
+          Validators.pattern(this.pattern),
+        ],
+        updateOn: 'blur',
+      },
+    ],
+    to: [
+      '',
+      {
+        validators: [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(15),
+          Validators.pattern(this.pattern),
+        ],
+        updateOn: 'blur',
+      },
+    ],
+    date: ['', [Validators.required, Validators.minLength(33), Validators.maxLength(33)], []],
+  });
 
   private readonly DEBOUNCE_MS = 250;
   private readonly DELAY_MS = 3_000;
-  private readonly fb = inject(FormBuilder);
-  private readonly flightService = inject(FlightService);
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
+
+  private readonly flightInputEffect = effect(() => this.patchFormValue(this.flight() as Flight));
+  private readonly flightParamEffect = effect(() => {
+    this.flight$ = this.flightService.findById('' + this.id());
+    this.flight$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (flight) => {
+        this.flight.set(flight);
+        this.patchFormValue(flight);
+        this.message = 'Success loading!';
+      },
+      error: (errResponse) => {
+        if (this.showDetails()) {
+          console.error(errResponse);
+        }
+        this.message = 'Error Loading!';
+      },
+    });
+  });
 
   constructor() {
-    this.setupEditForm();
     this.setupSubscriptions();
   }
 
-  ngOnChanges(): void {
-    this.patchFormValue();
-  }
-
-  onSave(): void {
+  protected onSave(): void {
     this.message = 'Is saving ...';
 
-    const flightToSave: Flight = this.editForm.value;
+    const flightToSave = this.editForm.value as Flight;
 
     this.flightService
       .save(flightToSave)
@@ -54,8 +96,8 @@ export class FlightEditComponent implements OnChanges {
         next: (flight) => {
           // console.warn('FlightEditComponent - onSave()');
           // console.log(flight);
-          this.flight = flight;
-          this.patchFormValue();
+          this.flight.set(flight);
+          this.patchFormValue(flight);
           this.message = 'Success saving! Navigating ...';
 
           setTimeout(() => this.router.navigate(['/flights/flight-search']), this.DELAY_MS);
@@ -67,35 +109,10 @@ export class FlightEditComponent implements OnChanges {
       });
   }
 
-  private setupEditForm(): void {
-    this.editForm = this.fb.group({
-      id: [0, Validators.required],
-      from: [
-        '',
-        {
-          validators: [
-            Validators.required,
-            Validators.minLength(3),
-            Validators.maxLength(15),
-            Validators.pattern(this.pattern),
-          ],
-          updateOn: 'blur',
-        },
-      ],
-      to: [
-        '',
-        {
-          validators: [
-            Validators.required,
-            Validators.minLength(3),
-            Validators.maxLength(15),
-            Validators.pattern(this.pattern),
-          ],
-          updateOn: 'blur',
-        },
-      ],
-      date: ['', [Validators.required, Validators.minLength(33), Validators.maxLength(33)], []],
-    });
+  private patchFormValue(flight: Flight): void {
+    if (this.editForm && flight) {
+      this.editForm.patchValue(flight);
+    }
   }
 
   private setupSubscriptions(): void {
@@ -108,33 +125,5 @@ export class FlightEditComponent implements OnChanges {
       .subscribe((value) => {
         console.log(value);
       });
-
-    this.flight$ = this.route.paramMap.pipe(
-      tap((paramMap: ParamMap) => {
-        this.id = Number(paramMap.get('id'));
-        this.showDetails = paramMap.get('showDetails') === 'true';
-      }),
-      switchMap((paramMap: ParamMap) => this.flightService.findById('' + paramMap.get('id'))),
-    );
-
-    this.flight$.pipe(takeUntilDestroyed()).subscribe({
-      next: (flight) => {
-        this.flight = flight;
-        this.patchFormValue();
-        this.message = 'Success loading!';
-      },
-      error: (errResponse) => {
-        if (this.showDetails) {
-          console.error(errResponse);
-        }
-        this.message = 'Error Loading!';
-      },
-    });
-  }
-
-  private patchFormValue(): void {
-    if (this.editForm && this.flight) {
-      this.editForm.patchValue(this.flight);
-    }
   }
 }

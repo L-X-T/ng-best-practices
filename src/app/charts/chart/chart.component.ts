@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, DestroyRef, effect, ElementRef, inject, input, viewChild } from '@angular/core';
 
 import { ChartsDataService } from './charts-data.service';
 import { BlinkService } from '../../shared/blink.service';
@@ -11,35 +11,36 @@ import 'anychart';
   styleUrl: './chart.component.scss',
   // changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() id = 0;
-  @Input() data = 'data1';
+export class ChartComponent {
+  readonly id = input(0);
+  readonly data = input('data1');
 
-  @ViewChild('container') container?: ElementRef;
+  // @ViewChild('container') container?: ElementRef;
+  readonly container = viewChild<ElementRef>('container');
 
   private chart?: anychart.charts.Pie | null;
 
   private readonly chartsDataService = inject(ChartsDataService);
   private readonly blinkService = inject(BlinkService);
   private readonly elementRef = inject(ElementRef);
+  private readonly destroyRef = inject(DestroyRef);
 
-  ngOnInit(): void {
-    // Default data set mapping, hardcoded here.
-    this.chart = anychart.pie(this.chartsDataService.getData(this.data));
-  }
+  constructor() {
+    effect(() => {
+      this.chart = anychart.pie(this.chartsDataService.getData(this.data()));
+      const container = this.container();
+      if (this.chart && container) {
+        this.chart.container(container.nativeElement);
+        this.chart.draw();
+      }
+    });
 
-  ngAfterViewInit(): void {
-    if (this.chart && this.container) {
-      this.chart.container(this.container.nativeElement);
-      this.chart.draw();
-    }
-  }
-
-  ngOnDestroy(): void {
-    if (this.chart) {
-      this.chart.dispose();
-      this.chart = null;
-    }
+    this.destroyRef.onDestroy(() => {
+      if (this.chart) {
+        this.chart.dispose();
+        this.chart = null;
+      }
+    });
   }
 
   blink(): void {
