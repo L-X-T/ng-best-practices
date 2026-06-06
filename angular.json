@@ -121,32 +121,39 @@
   },
   "cli": {
     "packageManager": "npm",
-    "schematicCollections": ["@angular-eslint/schematics"]
+    "schematicCollections": ["angular-eslint"]
   },
   "schematics": {
     "@schematics/angular:component": {
+      "skipTests": true,
       "style": "scss",
       "type": "component"
     },
     "@schematics/angular:directive": {
+      "skipTests": true,
       "type": "directive"
     },
     "@schematics/angular:service": {
+      "skipTests": true,
       "type": "service"
     },
     "@schematics/angular:guard": {
+      "skipTests": true,
       "typeSeparator": "."
     },
     "@schematics/angular:interceptor": {
+      "skipTests": true,
       "typeSeparator": "."
     },
     "@schematics/angular:module": {
       "typeSeparator": "."
     },
     "@schematics/angular:pipe": {
+      "skipTests": true,
       "typeSeparator": "."
     },
     "@schematics/angular:resolver": {
+      "skipTests": true,
       "typeSeparator": "."
     }
   }
