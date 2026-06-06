@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { NavbarComponent } from './navbar/navbar.component';
@@ -9,6 +9,7 @@ import { FooterComponent } from './footer/footer.component';
   imports: [RouterModule, SidebarComponent, NavbarComponent, FooterComponent],
   selector: 'app-b357-root',
   templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.component.scss',
 })
 export class AppComponent {}

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import { ChartComponent } from './chart/chart.component';
 
@@ -6,6 +6,7 @@ import { ChartComponent } from './chart/chart.component';
   selector: 'app-charts',
   imports: [ChartComponent],
   templateUrl: './charts.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './charts.component.scss',
 })
 export class ChartsComponent {

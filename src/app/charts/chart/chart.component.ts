@@ -1,4 +1,13 @@
-import { Component, DestroyRef, effect, ElementRef, inject, input, viewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  viewChild,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import { ChartsDataService } from './charts-data.service';
 import { BlinkService } from '../../shared/blink.service';
@@ -8,6 +17,7 @@ import 'anychart';
 @Component({
   selector: 'app-chart',
   templateUrl: './chart.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './chart.component.scss',
   // changeDetection: ChangeDetectionStrategy.OnPush,
 })

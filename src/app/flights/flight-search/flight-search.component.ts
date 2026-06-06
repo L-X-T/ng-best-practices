@@ -1,4 +1,13 @@
-import { Component, computed, DestroyRef, effect, ElementRef, inject, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  ElementRef,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -25,6 +34,7 @@ import { FlightValidationErrorsComponent } from '../flight-validation-errors/fli
     FlightValidationErrorsComponent,
   ],
   templateUrl: './flight-search.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './flight-search.component.scss',
   // changeDetection: ChangeDetectionStrategy.OnPush,
 })

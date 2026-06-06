@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, inject, input, model } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input, model, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -14,6 +14,7 @@ import { Flight } from '../../entities/flight';
 @Component({
   selector: 'app-flight-edit',
   imports: [ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './flight-edit.component.html',
 })
 export class FlightEditComponent {

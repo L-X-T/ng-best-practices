@@ -1,4 +1,13 @@
-import { Component, ElementRef, inject, input, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  inject,
+  input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import moment from 'moment';
 
@@ -10,6 +19,7 @@ import { BlinkService } from '../../shared/blink.service';
   selector: 'app-flight-card',
   imports: [CityPipe],
   templateUrl: './flight-card.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './flight-card.component.scss',
   // changeDetection: ChangeDetectionStrategy.OnPush,
 })

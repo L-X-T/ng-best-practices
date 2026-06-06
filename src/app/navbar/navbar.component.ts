@@ -1,7 +1,8 @@
-import { Component, DOCUMENT, inject } from '@angular/core';
+import { Component, DOCUMENT, inject, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-navbar',
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: 'navbar.component.html',
 })
 export class NavbarComponent {

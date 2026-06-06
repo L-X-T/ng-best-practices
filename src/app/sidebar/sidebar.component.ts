@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject } from '@angular/core';
+import { Component, ElementRef, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 
@@ -8,6 +8,7 @@ import { BlinkService } from '../shared/blink.service';
   selector: 'app-sidebar',
   imports: [RouterModule, NgOptimizedImage],
   templateUrl: 'sidebar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: 'sidebar.component.scss',
 })
 export class SidebarComponent {

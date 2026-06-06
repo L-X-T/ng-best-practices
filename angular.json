@@ -20,7 +20,7 @@
             "inlineStyleLanguage": "scss",
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": ["mixed-decls", "color-functions", "global-builtin", "import"]
+                "silenceDeprecations": ["color-functions", "global-builtin", "import"]
               }
             },
             "assets": [
@@ -35,7 +35,8 @@
               "node_modules/@angular-architects/paper-design/assets/scss/paper-dashboard.scss",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": ["anychart"]
           },
           "configurations": {
             "production": {
@@ -61,6 +62,13 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+            "testing": {
+              "aot": false,
+              "optimization": false,
+              "extractLicenses": false,
+              "styles": ["src/styles.scss"],
+              "polyfills": ["zone.js", "zone.js/testing"]
             }
           },
           "defaultConfiguration": "production"
@@ -84,19 +92,11 @@
           }
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": ["src/styles.scss"],
-            "scripts": []
+            "buildTarget": ":build:testing",
+            "runner": "vitest"
           }
         },
         "lint": {
@@ -120,12 +120,11 @@
     }
   },
   "cli": {
-    "packageManager": "pnpm",
+    "packageManager": "npm",
     "schematicCollections": ["@angular-eslint/schematics"]
   },
   "schematics": {
     "@schematics/angular:component": {
-      "changeDetection": "OnPush",
       "style": "scss",
       "type": "component"
     },
