@@ -120,7 +120,7 @@
     }
   },
   "cli": {
-    "packageManager": "npm",
+    "packageManager": "pnpm",
     "schematicCollections": ["angular-eslint"]
   },
   "schematics": {

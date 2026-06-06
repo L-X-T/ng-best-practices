@@ -1,6 +1,6 @@
 # TypeScript Style Guide
 
-Last updated on 2026-05-19.
+Last updated on 2026-06-06.
 
 This document contains guidelines for _Angular_ TypeScript files.
 
@@ -9,11 +9,11 @@ This document contains guidelines for _Angular_ TypeScript files.
 ### Must do
 
 - use [**Angular coding style guide**](https://angular.dev/style-guide)
-  - rule of one (https://angular.dev/style-guide#rule-of-one)
+  - [rule of one](https://angular.dev/style-guide#rule-of-one)
   - put entities and services into the scope where they are being used
 - use [**Prettier**](https://prettier.io/)
-  - use config from /.prettierrc
-  - use for .ts, .html, .scss, .md, .json
+  - use config from /prettier.config.js
+  - use for these endings: {css,html,js,json,md,scss,ts}
   - use Prettier on save hook
 - use [**ESLint**](https://eslint.org/)
   - use config from /eslint.config.js
@@ -33,11 +33,9 @@ This document contains guidelines for _Angular_ TypeScript files.
 - use `readonly` by default, unless a property needs to be reassigned
   - always use `readonly` on properties that are initialized by Angular
 - use `const` by default, unless a variable needs to be reassigned
-- suffix observables with `$`
-- prefer using the `AsyncPipe`, use the `takeUntilDestroyed()` operator if subscribing manually
-  - prefer subscribing in field initializer or constructor, else `DestroyRef` has to be passed in
 - keep constructors and lifecycle hooks simple and clean (basically only call methods, except one-liners)
   - avoid lifecycle hooks in the first place
+  - for DOM work after render, prefer `afterNextRender()` / `afterRenderEffect()` over `ngAfterViewInit`
 
 ### Should do
 
@@ -61,7 +59,6 @@ This document contains guidelines for _Angular_ TypeScript files.
     - other methods
 - place fields and methods next to each other if they belong together
   - no alphabetic order, no order by access modifier
-- avoid nested RxJS subscriptions (e.g., use switchMap instead)
 - prefer easily understandable code over performance (except for performance-critical code)
 - use strict equality (`===` / `!==`) instead of loose equality (`==` / `!=`)
 - sort imports (group and sort named imports alphabetically)
@@ -76,19 +73,31 @@ This document contains guidelines for _Angular_ TypeScript files.
 - `immutability` over `mutability` (for `OnPush` and `OnChanges`)
   - use `...` spread operator for shallow copies
   - use `structuredClone()` or a well-maintained package such as `klona` for deep copies
-- use `ChangeDetectionStrategy.OnPush`
+- rely on the framework default `OnPush` change detection; never opt a component into `Eager`
 - use `Standalone Components` over `Modules`
   - do not set `standalone: true` inside Angular decorators, it is the default in Angular v20+
 - use the Signals API for state management (`signal()`, `computed()`, `effect()`)
-- use signal inputs (`input()`, `input.required()`), outputs (`output()`), and queries (`viewChild()`) over decorators (`@Input()`, `@Output()`, `@ViewChild()`)
+- use signal inputs (`input()`, `input.required()`), models (`model()`), outputs (`output()`), and queries (`viewChild()`) over decorators (`@Input()`, `@Output()`, `@ViewChild()`)
+- use Signal Forms (stable in v22) for new forms (`form()`, schema-based validators, field state)
+  - do not write new Reactive or Template-driven forms; only touch existing ones, and prefer migrating to Signal Forms when asked
+- prefer `resource()`, `rxResource()`, or `httpResource()` (all stable in v22) for signal-driven read operations
+  - use service methods / `HttpClient` directly for mutations and imperative workflows
+- when using RxJS (interop, event streams, complex async):
+  - suffix observables with `$`
+  - prefer the `AsyncPipe`; when subscribing manually, use `takeUntilDestroyed()` (in a field initializer/constructor, else pass `DestroyRef`)
+  - avoid nested subscriptions (e.g. use `switchMap`)
+- assume a zoneless app: never import `zone.js`; rely on signals for reactivity (`provideZonelessChangeDetection()`)
 - prefer default `ViewEncapsulation` (`Emulated`)
 - prefer `inject()` over constructor dependency injection
   - group all `inject()` calls at the top of the class
+- prefer the `@Service()` decorator (new in v22) for new singleton services
+  - use `@Injectable({ providedIn: 'root' })` when provider configuration or compatibility requires it
+- consider `injectAsync()` to lazy-load heavy services where it reduces the initial bundle
 - it's okay to use `protected readonly` services directly in the View Template (HTML)
 - prefer initial / default values over `:Type | undefined` (might not make sense for objects)
 - prefer `?: Type` shorthand over `:Type | undefined`
 - use `symbolName: Partial<Type> = {}` if possible for objects
-- use `!` with caution and only if you are sure that the value can never be `null` or `undefined` (e.g. required `@Inputs`, static `@ViewChild`)
+- use `!` with caution and only if you are sure that the value can never be `null` or `undefined` (e.g. required `@Inputs`, `viewChild()`)
 - use `input.required<Type>()` for required inputs
 - use the `host` object in `@Component` or `@Directive` instead of `@HostBinding` and `@HostListener`
 - use variable `as` Type for type castings instead of `<Type>variable`
@@ -98,8 +107,8 @@ This document contains guidelines for _Angular_ TypeScript files.
 - don't use (default) `public` modifier for properties and methods
 - don't use ambiguous or unfamiliar abbreviations
 - don't leave debug logs in the codebase
-- remove empty constructors
-- remove empty methods
+- don't keep empty constructors
+- don't keep empty methods
 - don't default to external templates for very small components; prefer inline templates there
 - avoid `any`, prefer `unknown`
 - avoid these lifecycle hooks where possible
@@ -109,13 +118,14 @@ This document contains guidelines for _Angular_ TypeScript files.
 - if using signal-based data binding (signal inputs, outputs and queries) already
   - avoid ALL lifecycle hooks
 - don't put leading `I` for interfaces
+- don't prefix private/protected members with `_`
+- don't iterate `NodeListOf` / `HTMLCollectionOf` directly; wrap with `Array.from()` (no `[Symbol.iterator]` under this project's strict config)
 
 ## Resources
 
 - [Prettier](https://prettier.io/)
 - [ESLint](https://eslint.org/)
 - [Angular coding style guide](https://angular.dev/style-guide)
-- Draft of new [Angular coding style guide](https://gist.github.com/jelbourn/0158b02cfb426e69c172db4ec92e3c0c)
 - [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html)
 
 ## Back to index

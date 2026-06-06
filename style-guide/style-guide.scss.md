@@ -1,6 +1,6 @@
 # SCSS Style Guide
 
-Last updated on 2026-05-19.
+Last updated on 2026-06-06.
 
 This document contains guidelines for _Angular_ styling (SCSS) files.
 
@@ -55,6 +55,7 @@ This document contains guidelines for _Angular_ styling (SCSS) files.
   - 5.) Objects
   - 6.) Variants
 - prefer CSS logical properties (e.g., `margin-inline-start`) over physical properties (`margin-left`)
+- use `:has()` for parent/sibling state styling instead of JS-toggled classes where possible
 
 ## Don't
 

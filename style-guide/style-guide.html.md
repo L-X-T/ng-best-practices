@@ -1,6 +1,6 @@
 # HTML Template Style Guide
 
-Last updated on 2026-05-19.
+Last updated on 2026-06-06.
 
 This document contains guidelines for _Angular_ view templates (HTML files).
 
@@ -17,7 +17,7 @@ This document contains guidelines for _Angular_ view templates (HTML files).
   - use only **lowercase** for tags and attributes
   - use only necessary html attributes (e.g. no id="", no name="")
 - use new **control flow (@if, @for) syntax**
-- prefer `class.[name]` and `style.[property]` over `ngClass` and `ngStyle`
+- prefer `[class.name]` and `[style.property]` over `ngClass` and `ngStyle`
 - ensure accessibility (a11y) by using semantic HTML tags and ARIA attributes where necessary
 - use a stable unique primitive for the `track` expression in `@for` loops (e.g. `track item.id`)
 
@@ -36,8 +36,11 @@ This document contains guidelines for _Angular_ view templates (HTML files).
 - use `<!-- comment -->` for comments where really necessary
 - use `<!-- section -->` for labeling sections in the template if necessary
 - mark todos with `<!-- @ToDo: task description -->`
+- v22 allows HTML comments inside an element's opening tag (handy for annotating long attribute lists)
 - use `<self-closing-tags />` for components without content
-- use `ngSrc`, `width` & `height` (if known) and `alt` attributes for images
+- use `NgOptimizedImage` for static images (not for inline base64)
+  - with known dimensions: `ngSrc`, `width`, `height`, `alt`
+  - with unknown dimensions: `ngSrc` + `fill` and a parent with non-static `position` and a defined size
 - use `Angular Pipes` for formatting
 - control flow (`@if`, `@for`)
   - use boolean flags for complex `@if` statements
@@ -45,6 +48,9 @@ This document contains guidelines for _Angular_ view templates (HTML files).
   - use `ng-container` if no HTML element is needed
   - use `ng-container` if multiple elements use same `@if`
   - avoid tracking by object identity or `$index`, except for static lists
+- use `@let` for template-local values; don't abbreviate the alias – mirror the source signal name
+  - when the alias mirrors a signal, read it via `this.` to avoid self-reference (e.g. `@let flight = this.flight()`)
+- bind Signal Forms fields with the `FormField` directive (`[formField]="form.fieldName"`); avoid `ngModel` / `formControlName` in new code
 - use spaces in string interpolation `{{ example }}`
 - use spaces between pipes `{{ example | translate }}`
 - use local loading indicators (e.g. spinners) for async data
